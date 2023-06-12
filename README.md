@@ -5,7 +5,7 @@
 ```sh
 $ cd my-first-app
 $ sbt
-> jetty:start
+> Jetty / start
 > browse
 ```
 
