@@ -3,6 +3,9 @@ import scala.concurrent.ExecutionContext
 import scala.concurrent.ExecutionContext.Implicits.global
 import com.mchange.v2.c3p0.ComboPooledDataSource
 import org.slf4j.LoggerFactory
+import scala.util.Success
+
+import scala.util.Failure
 
 import org.scalatra._
 import javax.servlet.ServletContext
@@ -19,7 +22,10 @@ class ScalatraBootstrap extends LifeCycle {
   override def init(context: ServletContext) = {
     val db = Database.forDataSource(cpds, None)   // create the Database object
     implicit val executor: ExecutionContext = global
-    context.mount(new SlickApp(db), "/*")   // create and mount the Scalatra application
+    //
+    
+    //
+    context.mount(new SlickApp(db) with SlickRoutes, "/*")   // create and mount the Scalatra application
   }
 
   private def closeDbConnection() = {

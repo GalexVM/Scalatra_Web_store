@@ -17,21 +17,22 @@ trait SlickRoutes extends ScalatraBase with FutureSupport {
   def db: Database
   import Tables._
 
-  db.run(Tables.crearTablas).onComplete {
-  case Success(_) =>
-    // Aquí puedes realizar la inserción de los valores iniciales
-    db.run(Tables.insertarValoresInicialesMarcaYCategoria).onComplete {
+  get("/init"){
+    db.run(Tables.crearTablas).onComplete {
       case Success(_) =>
-        println("Inserción exitosa")
-      case Failure(error) =>
-        println(s"Error al insertar: ${error.getMessage}")
+      // Aquí puedes realizar la inserción de los valores iniciales
+      db.run(Tables.insertarValoresInicialesMarcaYCategoria).onComplete {
+        case Success(_) =>
+          println("Insercion exitosa")
+        case Failure(error) =>
+          println(s"Error al insertar: ${error.getMessage}")
+      }(scala.concurrent.ExecutionContext.Implicits.global)
+    case Failure(error) =>
+      println(s"Error al crear las tablas: ${error.getMessage}")
     }(scala.concurrent.ExecutionContext.Implicits.global)
-  case Failure(error) =>
-    println(s"Error al crear las tablas: ${error.getMessage}")
-}(scala.concurrent.ExecutionContext.Implicits.global)
+  }
 
-
-
+ 
 get("/categorias") {
   val tablaCat = db.run(Tables.categorías.result)
   tablaCat.map { xs =>
@@ -48,7 +49,7 @@ get("/marcas") {
   }(scala.concurrent.ExecutionContext.Implicits.global)
 }
 
-
+  
   get("/db/create-tables") {
     db.run(Tables.createSchemaAction)
   }
@@ -103,8 +104,8 @@ case class Producto(id: Option[Int], nombre: String, marca:String, categoría:St
 
 class SlickApp(val db: Database) extends ScalatraServlet with FutureSupport with SlickRoutes {
 
-  protected implicit def executor = scala.concurrent.ExecutionContext.Implicits.global
 
+  protected implicit def executor = scala.concurrent.ExecutionContext.Implicits.global
 
 
   get("/") {
