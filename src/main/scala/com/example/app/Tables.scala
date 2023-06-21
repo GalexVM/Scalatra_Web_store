@@ -9,7 +9,79 @@ import scala.concurrent.ExecutionContext
 //Database: 
 object Tables {
 
-  // Definition of the SUPPLIERS table
+  //Productos
+  class Producto(tag: Tag) extends Table[(Int,String,String,String,Double,String,Int)](tag,"PRODUCTOS"){
+    def id = column[Int]("PROD_ID", O.PrimaryKey, O.AutoInc) //PK
+    def nombre = column[String]("PROD_NAME")
+    def marca = column[String]("MARCA")//FK
+    def categoría = column[String]("CATEGORÍA")//FK
+    def precio = column[Double]("PROD_COST")
+    def descripción = column[String]("PROD_DESCRIP")
+    def cantidad_restante = column[Int]("CANTIDAD_RESTANTE")
+    // Every table needs a * projection with the same type as the table's type parameter
+    def * = (id, nombre, marca, categoría, precio, descripción, cantidad_restante)
+    def marcaNombre = foreignKey("MARCA_FK ", marca , marcas)(_.nombre)
+    def categoríaNombre = foreignKey("CATEG_FK", categoría, categorías)(_.nombre)
+  }
+
+  // Definition of the Marca table
+  class Marca(tag: Tag) extends Table[(Int, String, String, String, String)](tag, "MARCAS") {
+    def id = column[Int]("MARCA_ID", O.PrimaryKey, O.AutoInc) // This is the primary key column
+    def nombre = column[String]("NOMBRE")
+    def dirección = column[String]("DIRECCIÓN")
+    def dirección_entrega = column[String]("DIR_ENTR")
+    def contacto = column[String]("CONTACTO")
+    // Every table needs a * projection with the same type as the table's type parameter
+    def * = (id, nombre, dirección, dirección_entrega, contacto)
+  }
+
+  // Definition of the Marca categoria
+  class Categoría(tag: Tag) extends Table[(Int, String)](tag, "CATEGORIA") {
+    def id = column[Int]("CAT_ID", O.PrimaryKey, O.AutoInc) // This is the primary key column
+    def nombre = column[String]("NOMBRE")
+    // Every table needs a * projection with the same type as the table's type parameter
+    def * = (id, nombre)
+  }
+
+  val productos = TableQuery[Producto]
+  val marcas = TableQuery[Marca]
+  val categorías = TableQuery[Categoría]
+
+  val crearTablas = ( marcas.schema ++ categorías.schema ++ productos.schema ).create
+
+  //Valores iniciales de Categoría y Marca
+val insertarValoresInicialesMarcaYCategoria = DBIO.seq(
+  Tables.marcas.map(m => (m.nombre, m.dirección, m.dirección_entrega, m.contacto)) ++= Seq(
+    ("Gloria", "Arequipa", "Arequipa", "963521789"),
+    ("Laive", "Arequipa", "Arequipa", "953214768"),
+    ("Rico Pollo", "Lima", "Arequipa", "842153679"),
+    ("Frito Lay", "USA", "Lima", "513348962"),
+    ("Coca-Cola company", "USA", "Arequipa", "512365874"),
+    ("Ambrosoli", "Italia", "Lima", "421536987"),
+    ("Otro", "", "", "")
+  ),
+  Tables.categorías.map(c => c.nombre) ++= Seq(
+    "Bebidas",
+    "Carnes",
+    "Pescados y mariscos",
+    "Frutas",
+    "Verduras",
+    "Comida rápida",
+    "Embutidos",
+    "Lácteos",
+    "Snacks",
+    "Otros"
+  )
+)
+
+
+  
+
+
+
+  //EJEMPLOS:
+
+    // Definition of the SUPPLIERS table
   class Suppliers(tag: Tag) extends Table[(Int, String, String, String, String, String)](tag, "SUPPLIERS") {
     def id = column[Int]("SUP_ID", O.PrimaryKey) // This is the primary key column
     def name = column[String]("SUP_NAME")
