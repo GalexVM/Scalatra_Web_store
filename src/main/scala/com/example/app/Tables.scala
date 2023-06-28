@@ -14,14 +14,14 @@ object Tables {
     def id = column[Int]("PROD_ID", O.PrimaryKey, O.AutoInc) //PK
     def nombre = column[String]("PROD_NAME")
     def marca = column[String]("MARCA")//FK
-    def categoría = column[String]("CATEGORÍA")//FK
+    def categoria = column[String]("CATEGORIA")//FK
     def precio = column[Double]("PROD_COST")
     def descripción = column[String]("PROD_DESCRIP")
     def cantidad_restante = column[Int]("CANTIDAD_RESTANTE")
     // Every table needs a * projection with the same type as the table's type parameter
-    def * = (id, nombre, marca, categoría, precio, descripción, cantidad_restante)
+    def * = (id, nombre, marca, categoria, precio, descripción, cantidad_restante)
     def marcaNombre = foreignKey("MARCA_FK ", marca , marcas)(_.nombre)
-    def categoríaNombre = foreignKey("CATEG_FK", categoría, categorías)(_.nombre)
+    def categoriaNombre = foreignKey("CATEG_FK", categoria, categorias)(_.nombre)
   }
 
   // Definition of the Marca table
@@ -36,7 +36,7 @@ object Tables {
   }
 
   // Definition of the Marca categoria
-  class Categoría(tag: Tag) extends Table[(Int, String)](tag, "CATEGORIA") {
+  class Categoria(tag: Tag) extends Table[(Int, String)](tag, "CATEGORIA") {
     def id = column[Int]("CAT_ID", O.PrimaryKey, O.AutoInc) // This is the primary key column
     def nombre = column[String]("NOMBRE")
     // Every table needs a * projection with the same type as the table's type parameter
@@ -45,11 +45,11 @@ object Tables {
 
   val productos = TableQuery[Producto]
   val marcas = TableQuery[Marca]
-  val categorías = TableQuery[Categoría]
+  val categorias = TableQuery[Categoria]
 
-  val crearTablas = ( marcas.schema ++ categorías.schema ++ productos.schema ).create
+  val crearTablas = ( marcas.schema ++ categorias.schema ++ productos.schema ).create
 
-  //Valores iniciales de Categoría y Marca
+  //Valores iniciales de Categoria y Marca
 val insertarValoresInicialesMarcaYCategoria = DBIO.seq(
   Tables.marcas.map(m => (m.nombre, m.dirección, m.dirección_entrega, m.contacto)) ++= Seq(
     ("Gloria", "Arequipa", "Arequipa", "963521789"),
@@ -60,7 +60,7 @@ val insertarValoresInicialesMarcaYCategoria = DBIO.seq(
     ("Ambrosoli", "Italia", "Lima", "421536987"),
     ("Otro", "", "", "")
   ),
-  Tables.categorías.map(c => c.nombre) ++= Seq(
+  Tables.categorias.map(c => c.nombre) ++= Seq(
     "Bebidas",
     "Carnes",
     "Pescados y mariscos",
@@ -73,6 +73,8 @@ val insertarValoresInicialesMarcaYCategoria = DBIO.seq(
     "Otros"
   )
 )
+
+
 
 
   

@@ -15,8 +15,16 @@ lazy val hello = (project in file("."))
       "ch.qos.logback" % "logback-classic" % "1.2.3" % "runtime",
       "org.eclipse.jetty" % "jetty-webapp" % "9.4.43.v20210629" % "container",
       "javax.servlet" % "javax.servlet-api" % "3.1.0" % "provided",
-      "com.mchange" % "c3p0" % "0.9.5.2"
+      "com.mchange" % "c3p0" % "0.9.5.2",
+      "org.scalatra" %% "scalatra-twirl" % "2.8.1"
     ),
+
+    resolvers += "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots",
+    resolvers += "Sonatype OSS Releases" at "https://oss.sonatype.org/content/repositories/releases",
+    resolvers += "Typesafe Repository" at "https://repo.typesafe.com/typesafe/releases/",
+    resolvers += "Maven Central" at "https://repo1.maven.org/maven2/",
+
+
   )
 
 enablePlugins(SbtTwirl)
