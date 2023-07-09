@@ -1,9 +1,8 @@
-@(opciones: Seq[String])
 <!DOCTYPE html>
 <html>
-
   <head>
-    <style>
+    <link rel="stylesheet" type="text/css" href="styles.css">
+    <!-- <style>
       body {
         display: flex;
         justify-content: center;
@@ -47,11 +46,10 @@
       input[type="submit"]:hover {
         background-color: #45a049;
       }
-    </style>
+    </style> -->
   </head>
   <body>
-    
-    <form method="post" action="/form">
+    <form class="contents" method="post" action="/form">
       <label for="nombre">Nombre:</label>
       <input type="text" id="nombre" name="nombre" required>
 
@@ -59,11 +57,7 @@
       <input type="text" id="marca" name="marca" required>
 
       <label for="categoria">Categoría:</label>
-      <select id="categoria" name="categoria" multiple>
-        @for(opcion <- opciones) {
-          <option value="@opcion">@opcion</option>
-        }
-      </select>
+      <input type="text" id="categoría" name="categoría" required>
 
       <label for="precio">Precio:</label>
       <input type="text" id="precio" name="precio" required>

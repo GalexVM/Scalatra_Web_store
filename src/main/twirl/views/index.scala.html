@@ -1,22 +1,35 @@
 <html>
-        <head>
-            <style>
-            body {
-                max-width: 600px;
-                margin: 0 auto;
-                border: 1px solid black;
-                padding: 20px;
-            }
-            </style>
-      </head>
-      <body>
-        <h1>Marketplace</h1>
-        <p>Go to <a href="pages/bacon-ipsum">bacon page</a>.</p>
-        <p>Go to <a href="pages/veggie-ipsum">veggie page</a>.</p>
-        <p><a href="/addproduct">Añadir </a>un producto</p>
-        <p><a href="/productos">Ver todos los productos</a></p>
-        <p><a href="/marcas">Ver todas las marcas</a></p>
-        <p><a href="/categorias">Ver todas las categorías</a></p>
-        
-      </body>
+<head>
+    <link rel="stylesheet" type="text/css" href="styles.css">
+</head>
+
+<body>
+    <div class="top-bar">
+      <h1>Marketplace</h1>
+    </div>
+    <div class="contents">
+      <form method="get" action="pages/bacon-ipsum">
+        <button type="submit">Go to bacon page</button>
+      </form>
+      <form method="get" action="pages/veggie-ipsum">
+          <button type="submit">Go to veggie page</button>
+      </form>
+      <form method="get" action="/addproduct">
+          <button type="submit">Add a product</button>
+      </form>
+      <form method="post" action="/db/create-tables">
+          <button type="submit">Create database</button>
+      </form>
+      <form method="post" action="/db/load-data">
+          <button type="submit">Load data</button>
+      </form>
+      <form method="post" action="/db/drop-tables">
+          <button type="submit">Delete tables</button>
+      </form>
+      <form method="get" action="/coffees">
+          <button type="submit">Show query</button>
+      </form>
+    </div>
+</body>
+
 </html>
