@@ -1,4 +1,4 @@
-@(opciones1: Seq[String], opciones2:Seq[String])
+@(opciones1: Seq[String], opciones2:Seq[String], opciones3:Seq[String])
 <!DOCTYPE html>
 <html>
   <head>
@@ -47,37 +47,81 @@
       input[type="submit"]:hover {
         background-color: #45a049;
       }
-    </style> 
+ </style> 
+
   </head>
   <body>
-    <form class="contents" method="post" action="/form">
-      <label for="nombre">Nombre:</label>
-      <input type="text" id="nombre" name="nombre" required>
+    <div class ="create">
+      <form class="contents" method="post" action="/form">
+        <label for="nombre">Nombre:</label>
+        <input type="text" id="nombre" name="nombre" required>
+  
+        <label for="marca">Marca:</label>
+        <select id="marca" name="marca" required>
+          @for(opcion <- opciones2) {
+            <option value="@opcion">@opcion</option>
+          }
+        </select>
+  
+        <label for="categoría">Categoría:</label>
+        <select id="categoría" name="categoría" required>
+          @for(opcion <- opciones1) {
+            <option value="@opcion">@opcion</option>
+          }
+        </select>
+  
+        <label for="precio">Precio:</label>
+        <input type="text" id="precio" name="precio" required>
+  
+        <label for="descripcion">Descripción:</label>
+        <input type="text" id="descripción" name="descripción" required>
+  
+        <label for="cantidad_restante">Cantidad Restante:</label>
+        <input type="text" id="cantidad_restante" name="cantidad_restante" required>
+  
+        <input type="submit" value="Enviar">
+      </form>
+    </div>
 
-      <label for="marca">Marca:</label>
-      <select id="marca" name="marca" required>
-        @for(opcion <- opciones2) {
-          <option value="@opcion">@opcion</option>
-        }
-      </select>
+    <div class="delete">
+      <h3>Eliminar un producto</h3>
+      <form class="delete-content" method="post" action="/del-cont-form">
+        <select id="nombre" name="nombre">
+          @for(opcion<- opciones3){
+            <option value="@opcion">@opcion</opcion>
+          }
+        </select>
+        <input type="submit" value="Eliminar">
+      </form>
+    </div>
+    
+    <div class="update">
+      <h3>Actualizar un producto</h3>
+      <form class="update-content" method="post" action="/up-cont-form">
+        <select id="nombre" name="nombre">
+          @for(opcion<-opciones3){
+            <option value="@opcion">@opcion</opcion>
+          }
+        </select>
+        <label for="marca">Marca:</label>
+        <input type="text" id="marca" name="marca">
+  
+        <label for="categoría">Categoría:</label>
+        <input type="text" id="categoría" name="categoría" >
+  
+        <label for="precio">Precio:</label>
+        <input type="text" id="precio" name="precio" >
+  
+        <label for="descripcion">Descripción:</label>
+        <input type="text" id="descripción" name="descripción" >
+  
+        <label for="cantidad_restante">Cantidad Restante:</label>
+        <input type="text" id="cantidad_restante" name="cantidad_restante" >
+  
+        <input type="submit" value="Actualizar">
+       
+      </form>
+    </div>
 
-      <label for="categoría">Categoría:</label>
-      <select id="categoría" name="categoría" required>
-        @for(opcion <- opciones1) {
-          <option value="@opcion">@opcion</option>
-        }
-      </select>
-
-      <label for="precio">Precio:</label>
-      <input type="text" id="precio" name="precio" required>
-
-      <label for="descripcion">Descripción:</label>
-      <input type="text" id="descripción" name="descripción" required>
-
-      <label for="cantidad_restante">Cantidad Restante:</label>
-      <input type="text" id="cantidad_restante" name="cantidad_restante" required>
-
-      <input type="submit" value="Enviar">
-    </form>
   </body>
 </html>

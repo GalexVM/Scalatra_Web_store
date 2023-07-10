@@ -14,6 +14,11 @@ import org.scalatra.Ok
 import scala.concurrent.Await
 import scala.concurrent.duration._
 import play.twirl.api.HtmlFormat
+import scala.scalajs.js
+import org.scalajs.dom
+import org.scalajs.dom.document
+
+// import org.scalatra.scalate.ScalateSupport
 
 
 
@@ -41,13 +46,43 @@ get("/marcas") {
 
 get("/productos") {
   val tablaProd = db.run(Tables.productos.result)
-  tablaProd.map { xs =>
-    response.setContentType("text/plain") // Establecer el tipo de contenido de manera explícita
-    xs.map { case (s1, s2, s3, s4, s5, s6, s7) => f"|$s1|$s2|$s3|$s4|$s5|$s6|$s7|" }.mkString("\n")
+ tablaProd.map { xs =>
+  response.setContentType("text/html") // Set the content type to HTML
+  val tableRows = xs.map { case (s1, s2, s3, s4, s5, s6, s7) =>
+    <tr>
+      <td>{s1}</td>
+      <td>{s2}</td>
+      <td>{s3}</td>
+      <td>{s4}</td>
+      <td>{s5}</td>
+      <td>{s6}</td>
+      <td>{s7}</td>
+    </tr>
+  }
+  
+  val table = <table>
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Producto</th>
+        <th>Marca</th>
+        <th>Categoria</th>
+        <th>Tamaño</th>
+        <th>Column 6</th>
+        <th>Cantidad</th>
+      </tr>
+    </thead>
+    <tbody>
+      {tableRows}
+    </tbody>
+  </table>
+  
+  table.toString()
   }(scala.concurrent.ExecutionContext.Implicits.global)
+
 }
 
-  post("/form"){
+post("/form"){
     val nombre = params("nombre")
     val marca = params("marca")
     val categoría = params("categoría")
@@ -66,7 +101,7 @@ get("/productos") {
     insertFuture.map{productId =>
       redirect("/")
     }(scala.concurrent.ExecutionContext.Implicits.global)
-  }
+}
 
   post("/registerform"){
     val usuario = params("usuario")
@@ -75,7 +110,7 @@ get("/productos") {
     if(contrasena != contrasena2){
       redirect("/register")
     }
-    //Ya funciona, en el html habia puesto type=post en lugar de method=post xd
+
 
     val log = Login(None, usuario, contrasena, false)
     val insertAction = (logins.map(login=>(login.username,login.password,login.isAdmin))
@@ -87,6 +122,43 @@ get("/productos") {
       redirect("/")
     }(scala.concurrent.ExecutionContext.Implicits.global)
   }
+
+  post("/del-cont-form"){
+    val nombreProducto = params("nombre")
+    val deleteAction = productos.filter(_.nombre === nombreProducto).delete
+    val deleteFuture = db.run(deleteAction)
+    deleteFuture.map{numRowsDeleted=>
+      if(numRowsDeleted > 0){
+        println("Registro eliminado correctamente")
+      }else{
+        println("No se encontró el producto: $nombre")
+      }
+      redirect("/addproduct")
+    }(scala.concurrent.ExecutionContext.Implicits.global)
+  }
+
+  post("/up-cont-form") {
+    /*val nombre = params("nombre")
+    val marca = params.get("marca").map(_.trim).filter(_.nonEmpty).getOrElse(Tables.productos.filter(_.nombre === nombre).map(_.marca).result.head)
+    val categoría = params.get("categoría").map(_.trim)
+    val precio = params.get("precio").map(_.trim).filter(_.nonEmpty).map(_.toDouble).getOrElse(Tables.productos.filter(_.nombre === nombre).map(_.precio).result.head)
+    val descripción = params.get("descripción").map(_.trim)
+    val cantidad_restante = params.get("cantidad_restante").map(_.trim).filter(_.nonEmpty).map(_.toInt).getOrElse(Tables.productos.filter(_.nombre === nombre).map(_.cantidad_restante).result.head)
+
+    val updateQuery = productos
+      .filter(_.nombre === nombre)
+      .map(p => (p.marca, p.categoría, p.precio, p.descripción, p.cantidad_restante))
+      .update((marca, categoría, precio, descripción, cantidad_restante))
+
+    val updateFuture = db.run(updateQuery)
+
+    updateFuture.map { _ =>
+      redirect("/addproduct")
+    }(scala.concurrent.ExecutionContext.Implicits.global)*/
+  }
+
+
+
 }
 
 case class Producto(id: Option[Int], nombre: String, marca:String, categoría:String,
@@ -98,6 +170,7 @@ case class Login(id: Option[Int], username:String, password:String, isAdmin:Bool
 class SlickApp(val db: Database) extends ScalatraServlet with FutureSupport with SlickRoutes {
 
   import Tables._
+
   protected implicit def executor = scala.concurrent.ExecutionContext.Implicits.global
   private var tablesCreated = false;
   private var loginState = 0; //0 = not logged in, 1 = admin, 2 = user
@@ -126,11 +199,17 @@ class SlickApp(val db: Database) extends ScalatraServlet with FutureSupport with
       views.html.admin.render()
 
     }else if(loginState == 2){
-      views.html.client.render()
-    }
-    
-  }
+      val productosQuery = Tables.productos.result
+      val productosFuture: Future[Seq[(Int, String, String, String, Double, String, Int)]] = db.run(productosQuery)
+      val productos: Seq[(Int, String, String, String, Double, String, Int)] = Await.result(productosFuture, 2.seconds)
 
+
+      Ok(views.html.client(productos))
+
+    }
+  }
+    
+  
   post("/login-form"){
     val usuario = params("usuario")
     val contrasena = params("contrasena")
@@ -150,7 +229,6 @@ class SlickApp(val db: Database) extends ScalatraServlet with FutureSupport with
   get("/register"){
     views.html.register.render()
   }
-
   get("/pages/:name"){
     contentType = "text/html"
     params("name") match{
@@ -165,7 +243,10 @@ class SlickApp(val db: Database) extends ScalatraServlet with FutureSupport with
 
     val opciones2: Future[Seq[String]] = db.run(Tables.marcas.map(_.nombre).result)
     val marcas: Seq[String] = Await.result(opciones2,2.seconds)
-    Ok(views.html.add_product(categorías, marcas))
+
+    val opciones3: Future[Seq[String]] = db.run(Tables.productos.map(_.nombre).result)
+    val productos: Seq[String] = Await.result(opciones3,2.seconds)
+
+    Ok(views.html.add_product(categorías, marcas, productos))
   }
-  
 }

@@ -1,5 +1,30 @@
+
+
+@(productos: Seq[(Int, String, String, String, Double, String, Int)])
+<!DOCTYPE html>
 <html>
-    <body>
-        <h2>Productos disponibles</h2>
-    </body>
+<head>
+  <title>Productos del cliente</title>
+</head>
+<body>
+  <h1>Productos del cliente</h1>
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Nombre</th>
+        <th>Precio</th>
+      </tr>
+    </thead>
+    <tbody>
+        @for((id, nombre, _, _, precio, _, _) <- productos) {
+            <tr>
+              <td>@id</td>
+              <td>@nombre</td>
+              <td>@precio</td>
+            </tr>
+          }
+    </tbody>
+  </table>
+</body>
 </html>

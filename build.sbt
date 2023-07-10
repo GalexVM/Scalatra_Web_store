@@ -36,6 +36,16 @@ lazy val client = (project in file("client"))
     // Otras dependencias de Scala.js que puedas necesitar
   )
 
+//repite por si acaso
+enablePlugins(ScalaJSPlugin)
+
+scalaVersion := "2.13.1" // or any other Scala version >= 2.11.12
+
+// This is an application with a main method
+scalaJSUseMainModuleInitializer := true
 
 enablePlugins(SbtTwirl)
 enablePlugins(JettyPlugin)
+
+libraryDependencies += "org.scala-js" %%% "scalajs-dom" % "2.4.0"
+//libraryDependencies += "org.scalatra.scalate" %% "scalate-core" % "1.9.5"
