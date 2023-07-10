@@ -27,5 +27,15 @@ lazy val hello = (project in file("."))
 
   )
 
+lazy val client = (project in file("client"))
+  .enablePlugins(ScalaJSPlugin)
+  .settings(
+    scalaVersion := "2.13.9",
+    scalaJSLinkerConfig ~= (_.withModuleKind(ModuleKind.CommonJSModule)),
+    libraryDependencies += "org.scala-js" %%% "scalajs-dom" % "1.7.0",
+    // Otras dependencias de Scala.js que puedas necesitar
+  )
+
+
 enablePlugins(SbtTwirl)
 enablePlugins(JettyPlugin)

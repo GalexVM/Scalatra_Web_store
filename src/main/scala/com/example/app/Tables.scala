@@ -25,12 +25,13 @@ object Tables {
   }
 
   // Login
-  class Login(tag: Tag) extends Table[(Int, String, String)](tag, "USERS") {
+  class Login(tag: Tag) extends Table[(Int, String, String, Boolean)](tag, "USERS") {
     def id = column[Int]("ID", O.PrimaryKey, O.AutoInc)
     def username = column[String]("USERNAME")
     def password = column[String]("PASSWORD")
+    def isAdmin = column[Boolean]("ISADMIN")
 
-    def * = (id, username, password)
+    def * = (id, username, password, isAdmin)
   }
 
   // Definition of the Marca table
@@ -55,8 +56,9 @@ object Tables {
   val productos = TableQuery[Producto]
   val marcas = TableQuery[Marca]
   val categorías = TableQuery[Categoría]
+  val logins = TableQuery[Login]
 
-  val crearTablas = ( marcas.schema ++ categorías.schema ++ productos.schema ).create
+  val crearTablas = ( marcas.schema ++ categorías.schema ++ productos.schema ++ logins.schema).create
 
   //Valores iniciales de Categoría y Marca
 val insertarValoresInicialesMarcaYCategoria = DBIO.seq(
@@ -80,12 +82,13 @@ val insertarValoresInicialesMarcaYCategoria = DBIO.seq(
     "Lácteos",
     "Snacks",
     "Otros"
+  ),
+  Tables.logins.map(l=>(l.username,l.password,l.isAdmin))++=Seq(
+    ("Carlitos","1234",true),
+    ("Admin","1234",true),
+    ("Junior","1234",false)
   )
 )
-
-
-  
-
 
 
   //EJEMPLOS:
