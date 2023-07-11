@@ -1,0 +1,24 @@
+@(sum: Double, ids: String)
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Product Total Sum</title>
+</head>
+<body>
+  <h1>Product Total Sum</h1>
+  <form>
+    <label for="address">Address:</label>
+    <input type="text" id="address" name="address" required />
+    <br />
+    <label for="sum">Sum:</label>
+    <span id="sum">@sum</span>
+    <br />
+  </form>
+  <form method="post" action="\pagar">
+    <input type="hidden" id="ids" name="ids" value="@ids" />
+    <input type="hidden" id="sum" name="total" value="@sum" />
+    <button type="submit">Confirmar</button>
+  </form>
+</body>
+</html>

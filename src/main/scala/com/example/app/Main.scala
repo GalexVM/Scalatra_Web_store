@@ -19,6 +19,10 @@ import org.scalajs.dom
 import org.scalajs.dom.document
 import org.scalatra._
 
+import scala.collection.mutable
+import scala.math.BigDecimal
+
+
 //import org.scalatra.scalate.ScalateSupport
 
 
@@ -30,19 +34,31 @@ trait SlickRoutes extends ScalatraBase with FutureSupport {
 
 
 get("/categorias") {
-  val tablaCat = db.run(Tables.categorías.result)
+   
+  val categoriasFuture: Future[Seq[(Int, String)]] = db.run(Tables.categorías.result)
+
+  categoriasFuture.map { cats =>
+    Ok(views.html.categorias(cats))
+  }(scala.concurrent.ExecutionContext.Implicits.global)
+
+  /*val tablaCat = db.run(Tables.categorías.result)
   tablaCat.map { xs =>
     response.setContentType("text/plain") // Establecer el tipo de contenido de manera explícita
     xs.map { case (s1, s2) => f"$s1 | $s2 |" }.mkString("\n")
-  }(scala.concurrent.ExecutionContext.Implicits.global)
+  }(scala.concurrent.ExecutionContext.Implicits.global)*/
 }
 
 get("/marcas") {
-  val tablaMarca = db.run(Tables.marcas.result)
+    val marcasFuture: Future[Seq[(Int, String, String, String, String)]] = db.run(Tables.marcas.result)
+
+  marcasFuture.map { marc =>
+    Ok(views.html.marcas(marc))
+  }(scala.concurrent.ExecutionContext.Implicits.global)
+  /*val tablaMarca = db.run(Tables.marcas.result)
   tablaMarca.map { xs =>
     response.setContentType("text/plain") // Establecer el tipo de contenido de manera explícita
     xs.map { case (s1, s2, s3, s4, s5) => f"|$s1|$s2|$s3|$s4|$s5|" }.mkString("\n")
-  }(scala.concurrent.ExecutionContext.Implicits.global)
+  }(scala.concurrent.ExecutionContext.Implicits.global)*/
 }
 
 get("/productos") {
@@ -241,7 +257,24 @@ post("/form"){
     val productosQuery = Tables.carritos.result
     val productosFuture: Future[Seq[(Int, String,  Double)]] = db.run(productosQuery)
     val productos: Seq[(Int, String,  Double)] = Await.result(productosFuture, 2.seconds)
-    Ok(views.html.carrito(productos))
+
+    val sumAction = Tables.carritos.map(_.precio).sum
+    val sumFuture: Future[Option[Double]] = db.run(sumAction.result)
+    val sumOption: Option[Double] = Await.result(sumFuture, 2.seconds)
+    val sum: Double = sumOption.getOrElse(0.0) // Valor predeterminado en caso de que el resultado sea None
+    val roundSum = BigDecimal(sum).setScale(2, BigDecimal.RoundingMode.HALF_UP).toDouble
+
+    val seqAction = carritos.map(_.id).result.map(_.toSeq)(ExecutionContext.global)
+    val seqFuture = db.run(seqAction)
+    val seqResult: Seq[Int] = Await.result(seqFuture, 2.seconds)
+    val comma: String = seqResult.mkString(",")
+
+
+    
+      Ok(views.html.carrito(productos, roundSum, comma))
+    
+
+    //val seq: Seq[Int] = Await.result(seqFuture, 2.seconds)
   }
 
   post("/add-carrito") {
@@ -259,7 +292,119 @@ post("/form"){
     }(scala.concurrent.ExecutionContext.Implicits.global)
   }
 
+  post("/del-carrito") {
+    val nombre = params("nombre")
+    val deleteAction = carritos.filter(_.nombre === nombre).delete
+    val deleteFuture = db.run(deleteAction)
+    deleteFuture.map{numRowsDeleted=>
+      if(numRowsDeleted > 0){
+        println("Registro eliminado correctamente")
+      }else{
+        println("No se encontró el producto: $nombre")
+      }
+      redirect("/carrito")
+    }(scala.concurrent.ExecutionContext.Implicits.global)
+  }
+
+post("/comprar") {
+  val sum = params("total").toDouble
+  val ids = params("ids")
+  Ok(views.html.comprar(sum, ids))
 }
+
+post("/pagar") {
+  val sum = params("total")
+  val ids = params("ids")
+
+  println(ids)
+  val seqIds = ids.split(",").map(_.toInt).toSeq
+
+    seqIds.foreach { id =>
+    val cantAction = productos.filter(_.id === id).map(p => p.cantidad_restante).result.head
+    val cantFuture: Future[Int] = db.run(cantAction)
+    val cant: Int = Await.result(cantFuture, 2.seconds)
+
+    val updateAction = productos
+      .filter(_.id === id)
+      .map(p => p.cantidad_restante)
+      .update(cant - 1)
+      val updateFuture = db.run(updateAction)
+
+      val deleteAction = carritos.filter(_.id === id).delete
+      val deleteFuture = db.run(deleteAction)
+      }
+
+      redirect("/")
+  }
+
+
+post("/update-cats"){
+    val id = params("id").toInt
+    val nombre = params("nombre")
+
+    val updateQuery = categorías
+    .filter(_.id === id)
+    .map(p => (p.nombre))
+    .update((nombre))
+
+    val updateFuture = db.run(updateQuery)
+
+    updateFuture.map { _ =>
+      redirect("/categorias")
+    }(scala.concurrent.ExecutionContext.Implicits.global)
+}
+
+post("/update-marcas"){
+    val id = params("id").toInt
+    val nombre = params("nombre")
+    val dirección = params("dirección")
+    val dirección_entrega = params("dirección_entrega")
+    val contacto = params("contacto")
+
+    val updateQuery = marcas
+    .filter(_.id === id)
+    .map(p => (p.nombre, p.dirección, p.dirección_entrega, p.contacto))
+    .update((nombre, dirección, dirección_entrega, contacto))
+
+    val updateFuture = db.run(updateQuery)
+
+    updateFuture.map { _ =>
+      redirect("/marcas")
+    }(scala.concurrent.ExecutionContext.Implicits.global)
+}
+
+ post("/del-marcas-form"){
+    val nombreMarca = params("nombre")
+    val deleteAction = marcas.filter(_.nombre === nombreMarca).delete
+    val deleteFuture = db.run(deleteAction)
+    deleteFuture.map{numRowsDeleted=>
+      if(numRowsDeleted > 0){
+        println("Registro eliminado correctamente")
+      }else{
+        println("No se encontró el producto: $nombre")
+      }
+      redirect("/marcas")
+    }(scala.concurrent.ExecutionContext.Implicits.global)
+  }
+
+   post("/del-cats-form"){
+    val nombreCat = params("nombre")
+    val deleteAction = categorías.filter(_.nombre === nombreCat).delete
+    val deleteFuture = db.run(deleteAction)
+    deleteFuture.map{numRowsDeleted=>
+      if(numRowsDeleted > 0){
+        println("Registro eliminado correctamente")
+      }else{
+        println("No se encontró el producto: $nombre")
+      }
+      redirect("/marcas")
+    }(scala.concurrent.ExecutionContext.Implicits.global)
+  }
+
+}
+
+
+
 
 case class Producto(id: Option[Int], nombre: String, marca:String, categoría:String,
                 precio:Double, descripción:String, cantidad_restante:Int)
@@ -311,27 +456,42 @@ class SlickApp(val db: Database) extends ScalatraServlet with FutureSupport with
         Ok(views.html.client(productos, categorías))
     }
   }
+  post("/logout-client"){
+    loginState = 0
+    redirect("/")
+  }
+  post("/logout"){
+    loginState = 0
+    redirect("/")
+  }
     
   
-  post("/login-form"){
-    val usuario = params("usuario")
-    val contrasena = params("contrasena")
-    val query = logins.filter(login => login.username === usuario && login.password === contrasena)
-    val result = db.run(query.result.headOption)
-    result.map {
-    case Some((id, _, _,true)) =>
+post("/login-form") {
+  val usuario = params("usuario")
+  val contrasena = params("contrasena")
+  val query = logins.filter(login => login.username === usuario && login.password === contrasena)
+  val result = db.run(query.result.headOption)
+  result.map {
+    case Some((id, _, _, true)) =>
       loginState = 1
+      response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate")
+      response.setHeader("Pragma", "no-cache")
+      response.setHeader("Expires", "0")
       redirect("/")
-    case Some((id, _, _,false)) =>
+    case Some((id, _, _, false)) =>
       loginState = 2
+      response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate")
+      response.setHeader("Pragma", "no-cache")
+      response.setHeader("Expires", "0")
       redirect("/")
     case None =>
+      response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate")
+      response.setHeader("Pragma", "no-cache")
+      response.setHeader("Expires", "0")
       redirect("/")
-    }(scala.concurrent.ExecutionContext.Implicits.global)
-  }
-  get("/register"){
-    views.html.register.render()
-  }
+  }(scala.concurrent.ExecutionContext.Implicits.global)
+}
+
 
   get("/addproduct"){
     val opciones: Future[Seq[String]] = db.run(Tables.categorías.map(_.nombre).result)

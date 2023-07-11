@@ -1,0 +1,73 @@
+@(marcas: Seq[(Int, String, String, String, String)])
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Productos</title>
+</head>
+<style>
+  body {
+    font-family: Verdana, sans-serif;
+  }
+    td {
+        display: flex;
+    }
+    form {
+        display: flex;
+        align-items: center;
+        margin-right: 20px; 
+    }
+    .input-table-head {
+        width: 200px;
+        display: inline-block;
+        padding: 4px 8px;
+        border: none;
+        background-color: coral;
+        color: white;
+        margin-right: 8px;
+    }
+    .input-table-cell {
+        width: 198px;
+        display: inline-block;
+        padding: 4px 8px;
+        border: none;
+        margin-right: 10px;
+    }
+</style>
+<body>
+
+  <h1>Productos</h1>
+  <table>
+    <thead>
+      <tr>
+        <form>
+            <input class="input-table-head" name="id" value="ID" readonly>
+            <input class="input-table-head" name="nombre" value="Nombre" readonly>
+            <input class="input-table-head" name="dirección" value="Dirección" readonly>
+            <input class="input-table-head" name="dirección_entrega" value="Dirección de entrega" readonly>
+            <input class="input-table-head" name="contacto" value="Contacto" readonly>
+          </form>
+      </tr>
+    </thead>
+    <tbody>
+        @for((id, nombre, dirección, dirección_entrega, contacto) <- marcas) {
+            <tr>
+                <td>
+                    <form method="POST" action="/update-marcas">
+                      <input class="input-table-cell" name="id" value="@id" readonly>
+                      <input class="input-table-cell" name="nombre" value="@nombre">
+                      <input class="input-table-cell" name="dirección" value="@dirección">
+                      <input class="input-table-cell" name="dirección_entrega" value="@dirección_entrega">
+                      <input class="input-table-cell" name="contacto" value="@contacto">
+                      <button type="submit">Update</button>
+                    </form>
+                    <form method="POST" action="/del-marcas-form">
+                        <input type="hidden" class="input-table-cell" name="nombre" value="@nombre">
+                        <button type="submit">Delete</button>
+                    </form>
+                </td>
+            </tr>
+          }
+    </tbody>
+  </table>
+</body>
+</html>
