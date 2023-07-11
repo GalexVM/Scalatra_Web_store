@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Productos</title>
+  <title>Marcas</title>
 </head>
 <style>
   body {
@@ -35,7 +35,7 @@
 </style>
 <body>
 
-  <h1>Productos</h1>
+  <h1>Marcas</h1>
   <table>
     <thead>
       <tr>
@@ -54,19 +54,29 @@
                 <td>
                     <form method="POST" action="/update-marcas">
                       <input class="input-table-cell" name="id" value="@id" readonly>
-                      <input class="input-table-cell" name="nombre" value="@nombre">
+                      <input class="input-table-cell" name="nombre" value="@nombre" readonly>
                       <input class="input-table-cell" name="dirección" value="@dirección">
                       <input class="input-table-cell" name="dirección_entrega" value="@dirección_entrega">
                       <input class="input-table-cell" name="contacto" value="@contacto">
-                      <button type="submit">Update</button>
+                      <button type="submit">Actualizar</button>
                     </form>
-                    <form method="POST" action="/del-marcas-form">
-                        <input type="hidden" class="input-table-cell" name="nombre" value="@nombre">
-                        <button type="submit">Delete</button>
-                    </form>
+
                 </td>
             </tr>
           }
+          <tr>
+            <td>
+              <form method="POST" action="/add-marcas">
+                <input class="input-table-cell" name="id" placeholder="id" readonly>
+                <input class="input-table-cell" name="nombre" placeholder="nombre" >
+                <input class="input-table-cell" name="dirección" placeholder="dirección">
+                <input class="input-table-cell" name="dirección_entrega" placeholder="dirección_entrega">
+                <input class="input-table-cell" name="contacto" placeholder="contacto">
+                <button type="submit">Añadir</button>
+              </form>
+
+            </td>
+          </tr>
     </tbody>
   </table>
 </body>

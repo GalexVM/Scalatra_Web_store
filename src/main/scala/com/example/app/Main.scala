@@ -401,10 +401,49 @@ post("/update-marcas"){
     }(scala.concurrent.ExecutionContext.Implicits.global)
   }
 
+  post("/add-marcas")
+  {
+    val nombre = params("nombre")
+    val dirección = params("dirección")
+    val dirección_entrega = params("dirección_entrega")
+    val contacto = params("contacto")
+
+    val marca = Marca(None, nombre, dirección, dirección_entrega, contacto)
+
+    val insertAction = (Tables.marcas.map(m=>(m.nombre,m.dirección,m.dirección_entrega,m.contacto))
+                        returning Tables.marcas.map(_.id))+=
+                        (marca.nombre,marca.dirección,marca.dirección_entrega,marca.contacto)
+
+    val insertFuture = db.run(insertAction)
+    insertFuture.map{marcaId =>
+      println("registro exitoso")
+      redirect("/marcas")
+    }(scala.concurrent.ExecutionContext.Implicits.global)             
+  }
+
+  post("/add-categ")
+  {
+    val nombre = params("nombre")
+
+
+    val categ = Categoria(None, nombre)
+
+    val insertAction = (Tables.categorías.map(m=>(m.nombre))
+                        returning Tables.categorías.map(_.id))+=
+                        (categ.nombre)
+
+    val insertFuture = db.run(insertAction)
+    insertFuture.map{categId =>
+      println("registro exitoso")
+      redirect("/categorias")
+    }(scala.concurrent.ExecutionContext.Implicits.global)             
+  }
+
 }
 
+case class Categoria(id:Option[Int], nombre:String)
 
-
+case class Marca(id:Option[Int], nombre:String, dirección:String, dirección_entrega:String, contacto:String)
 
 case class Producto(id: Option[Int], nombre: String, marca:String, categoría:String,
                 precio:Double, descripción:String, cantidad_restante:Int)

@@ -52,15 +52,21 @@
                     <form method="POST" action="/update-cats">
                       <input class="input-table-cell" name="id" value="@id" readonly>
                       <input class="input-table-cell" name="nombre" value="@nombre">
-                      <button type="submit">Update</button>
                     </form>
-                    <form method="POST" action="/del-cats-form">
-                        <input type="hidden" class="input-table-cell" name="nombre" value="@nombre">
-                        <button type="submit">Delete</button>
-                    </form>
+
                 </td>
             </tr>
           }
+          <tr>
+            <td>
+              <form method="POST" action="/add-categ">
+                <input class="input-table-cell" name="id" placeholder="id" readonly>
+                <input class="input-table-cell" name="nombre" placeholder="nombre" >
+                <button type="submit">Añadir</button>
+              </form>
+
+            </td>
+          </tr>
     </tbody>
   </table>
 </body>
