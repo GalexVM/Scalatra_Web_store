@@ -39,6 +39,7 @@
   <h1>Filtrar</h1>
   <form method="POST" action="/filtrar">
     <select id="categoría", name="categoría">
+        <option value ="Todo">Todo</option>
         @for(cat <- cats){
             <option value="@cat">@cat</opcion>
         }

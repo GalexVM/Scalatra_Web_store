@@ -197,6 +197,10 @@ post("/form"){
 
   post("/filtrar"){
     val categoría = params("categoría")
+    if(categoría == "Todo")
+    {
+      redirect("/productos")
+    }
     val filterquery = productos.filter(_.categoría === categoría)
 
 
@@ -214,6 +218,10 @@ post("/form"){
 
   post("/filtrar-cliente"){
     val categoría = params("categoría")
+    if(categoría == "Todo")
+    {
+      redirect("/")
+    }
     val filterquery = productos.filter(_.categoría === categoría)
 
 
