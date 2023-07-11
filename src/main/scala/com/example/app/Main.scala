@@ -17,8 +17,9 @@ import play.twirl.api.HtmlFormat
 import scala.scalajs.js
 import org.scalajs.dom
 import org.scalajs.dom.document
+import org.scalatra._
 
-// import org.scalatra.scalate.ScalateSupport
+//import org.scalatra.scalate.ScalateSupport
 
 
 
@@ -45,41 +46,55 @@ get("/marcas") {
 }
 
 get("/productos") {
-  val tablaProd = db.run(Tables.productos.result)
- tablaProd.map { xs =>
-  response.setContentType("text/html") // Set the content type to HTML
-  val tableRows = xs.map { case (s1, s2, s3, s4, s5, s6, s7) =>
-    <tr>
-      <td>{s1}</td>
-      <td>{s2}</td>
-      <td>{s3}</td>
-      <td>{s4}</td>
-      <td>{s5}</td>
-      <td>{s6}</td>
-      <td>{s7}</td>
-    </tr>
-  }
+//   val tablaProd = db.run(Tables.productos.result)
+//  tablaProd.map { xs =>
+//   response.setContentType("text/html") // Set the content type to HTML
+//   val tableRows = xs.map { case (s1, s2, s3, s4, s5, s6, s7) =>
+//     <tr>
+//       <td>{s1}</td>
+//       <td>{s2}</td>
+//       <td>{s3}</td>
+//       <td>{s4}</td>
+//       <td>{s5}</td>
+//       <td>{s6}</td>
+//       <td>{s7}</td>
+//     </tr>
+//   }
   
-  val table = <table>
-    <thead>
-      <tr>
-        <th>ID</th>
-        <th>Producto</th>
-        <th>Marca</th>
-        <th>Categoria</th>
-        <th>Tamaño</th>
-        <th>Column 6</th>
-        <th>Cantidad</th>
-      </tr>
-    </thead>
-    <tbody>
-      {tableRows}
-    </tbody>
-  </table>
+//   val table = <table>
+//     <thead>
+//       <tr>
+//         <th>ID</th>
+//         <th>Producto</th>
+//         <th>Marca</th>
+//         <th>Categoria</th>
+//         <th>Tamaño</th>
+//         <th>Descripcion</th>
+//         <th>Cantidad</th>
+//       </tr>
+//     </thead>
+//     <tbody>
+//       {tableRows}
+//     </tbody>
+//   </table>
   
-  table.toString()
-  }(scala.concurrent.ExecutionContext.Implicits.global)
+//   table.toString()
+//   }(scala.concurrent.ExecutionContext.Implicits.global)
+    /*val productosQuery = Tables.productos.result
+    val productosFuture: Future[Seq[(Int, String, String, String, Double, String, Int)]] = db.run(productosQuery)
+    val productos: Seq[(Int, String, String, String, Double, String, Int)] = Await.result(productosFuture, 2.seconds)
+    //cambiar a vista admin productos
+    println(productos)
+   Ok(views.html.products(productos))*/
 
+  val opciones: Future[Seq[String]] = db.run(Tables.categorías.map(_.nombre).result)
+  val categorías: Seq[String] = Await.result(opciones,2.seconds)
+
+  val productosFuture: Future[Seq[(Int, String, String, String, Double, String, Int)]] = db.run(Tables.productos.result)
+
+  productosFuture.map { productos =>
+    Ok(views.html.products(productos, categorías))
+  }(scala.concurrent.ExecutionContext.Implicits.global)
 }
 
 post("/form"){
@@ -133,7 +148,7 @@ post("/form"){
       }else{
         println("No se encontró el producto: $nombre")
       }
-      redirect("/addproduct")
+      redirect("/productos")
     }(scala.concurrent.ExecutionContext.Implicits.global)
   }
 
@@ -158,6 +173,83 @@ post("/form"){
   }
 
 
+  post("/update"){
+    val id = params("id").toInt
+    val nombre = params("nombre")
+    val marca = params("marca")
+    val categoría = params("categoría")
+    val precio = params("precio").toDouble
+    val descripción = params("descripción")
+    val cantidad_restante = params("cantidad_restante").toInt
+    
+    val updateQuery = productos
+    .filter(_.id === id)
+    .map(p => (p.nombre, p.marca, p.categoría, p.precio, p.descripción, p.cantidad_restante))
+    .update((nombre, marca, categoría, precio, descripción, cantidad_restante))
+
+    val updateFuture = db.run(updateQuery)
+
+    updateFuture.map { _ =>
+      redirect("/productos")
+    }(scala.concurrent.ExecutionContext.Implicits.global)
+    
+  }
+
+  post("/filtrar"){
+    val categoría = params("categoría")
+    val filterquery = productos.filter(_.categoría === categoría)
+
+
+    val productosQuery = Tables.productos.filter(_.categoría === categoría).result
+    val productosFuture: Future[Seq[(Int, String, String, String, Double, String, Int)]] = db.run(productosQuery)
+
+    val opciones: Future[Seq[String]] = db.run(Tables.categorías.map(_.nombre).result)
+    val categorías: Seq[String] = Await.result(opciones,2.seconds)
+
+    productosFuture.map { productos =>
+      Ok(views.html.products(productos, categorías))
+    }(scala.concurrent.ExecutionContext.Implicits.global)
+
+  }
+
+  post("/filtrar-cliente"){
+    val categoría = params("categoría")
+    val filterquery = productos.filter(_.categoría === categoría)
+
+
+    val productosQuery = Tables.productos.filter(_.categoría === categoría).result
+    val productosFuture: Future[Seq[(Int, String, String, String, Double, String, Int)]] = db.run(productosQuery)
+
+    val opciones: Future[Seq[String]] = db.run(Tables.categorías.map(_.nombre).result)
+    val categorías: Seq[String] = Await.result(opciones,2.seconds)
+
+    productosFuture.map { productos =>
+      Ok(views.html.client(productos, categorías))
+    }(scala.concurrent.ExecutionContext.Implicits.global)
+
+  }
+
+   get("/carrito") {
+    val productosQuery = Tables.carritos.result
+    val productosFuture: Future[Seq[(Int, String,  Double)]] = db.run(productosQuery)
+    val productos: Seq[(Int, String,  Double)] = Await.result(productosFuture, 2.seconds)
+    Ok(views.html.carrito(productos))
+  }
+
+  post("/add-carrito") {
+    val nombre = params("nombre")
+    val precio = params("precio").toDouble
+
+    val carrito = Carrito(None, nombre, precio)
+    val insertAction = (Tables.carritos.map(c=>(c.nombre,c.precio))
+                        returning Tables.carritos.map(_.id))+=
+                        (carrito.nombre,carrito.precio)
+    val insertFuture = db.run(insertAction)
+    insertFuture.map{carritoId =>
+      println("registro exitoso")
+      redirect("/carrito")
+    }(scala.concurrent.ExecutionContext.Implicits.global)
+  }
 
 }
 
@@ -166,6 +258,7 @@ case class Producto(id: Option[Int], nombre: String, marca:String, categoría:St
 
 case class Login(id: Option[Int], username:String, password:String, isAdmin:Boolean)
 
+case class Carrito(id: Option[Int], nombre:String, precio:Double)
 
 class SlickApp(val db: Database) extends ScalatraServlet with FutureSupport with SlickRoutes {
 
@@ -199,13 +292,15 @@ class SlickApp(val db: Database) extends ScalatraServlet with FutureSupport with
       views.html.admin.render()
 
     }else if(loginState == 2){
-      val productosQuery = Tables.productos.result
-      val productosFuture: Future[Seq[(Int, String, String, String, Double, String, Int)]] = db.run(productosQuery)
-      val productos: Seq[(Int, String, String, String, Double, String, Int)] = Await.result(productosFuture, 2.seconds)
+      //Vista cliente productos
+        val productosQuery = Tables.productos.result
+        val productosFuture: Future[Seq[(Int, String, String, String, Double, String, Int)]] = db.run(productosQuery)
+        val productos: Seq[(Int, String, String, String, Double, String, Int)] = Await.result(productosFuture,2.seconds)
 
-
-      Ok(views.html.client(productos))
-
+        val opciones: Future[Seq[String]] = db.run(Tables.categorías.map(_.nombre).result)
+        val categorías: Seq[String] = Await.result(opciones,2.seconds)
+        
+        Ok(views.html.client(productos, categorías))
     }
   }
     
@@ -229,14 +324,7 @@ class SlickApp(val db: Database) extends ScalatraServlet with FutureSupport with
   get("/register"){
     views.html.register.render()
   }
-  get("/pages/:name"){
-    contentType = "text/html"
-    params("name") match{
-      case "bacon-ipsum" => views.html.bacon_ipsum.render()
-      case "veggie-ipsum" => views.html.veggie_ipsum.render()
-      case other => halt(404,"not found")
-    }
-  }
+
   get("/addproduct"){
     val opciones: Future[Seq[String]] = db.run(Tables.categorías.map(_.nombre).result)
     val categorías: Seq[String] = Await.result(opciones,2.seconds)

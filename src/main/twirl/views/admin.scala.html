@@ -1,19 +1,49 @@
 <html>
-<head>
-    <link rel="stylesheet" type="text/css" href="styles.css">
+<head>  
+    <title>Administrador</title> 
 </head>
+<style>
+    body {
 
+        margin: 0 auto;
+        border: 1px solid black;
+
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #f7f7f7;
+        tab-size: 4;
+    }
+    form {
+        display: contents;
+    }
+    .contents {
+        display: flex;
+        width: 100%;
+        background-color: #CF0A0A;
+    }
+      button {
+        padding: 10px 20px;
+        background-color: #CF0A0A;
+        color: white;
+        border: none;
+        cursor: pointer;
+        margin: 30px;
+        width: 25%;
+        height: 10%;
+        font-size: medium;
+        }
+        .top-bar {
+            background-color: #000000;
+            padding: 10px;
+            margin-bottom: 20px;
+            text-align: left;
+            color: white;
+        }
+</style>
 <body>
     <div class="top-bar">
-      <h1>sECCIÓN DE ADMINISTRADOR</h1>
+      <h1>SECCIÓN DE ADMINISTRADOR</h1>
     </div>
     <div class="contents">
-      <form method="get" action="pages/bacon-ipsum">
-        <button type="submit">Go to bacon page</button>
-      </form>
-      <form method="get" action="pages/veggie-ipsum">
-          <button type="submit">Go to veggie page</button>
-      </form>
       <form method="get" action="/addproduct">
           <button type="submit">Añadir un producto</button>
       </form>
@@ -27,6 +57,7 @@
           <button type="submit">Ver categorías</button>
       </form>
     </div>
+
 </body>
 
 </html>

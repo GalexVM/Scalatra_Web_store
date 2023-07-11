@@ -17,12 +17,15 @@ lazy val hello = (project in file("."))
       "javax.servlet" % "javax.servlet-api" % "3.1.0" % "provided",
       "com.mchange" % "c3p0" % "0.9.5.2",
       "org.scalatra" %% "scalatra-twirl" % "2.8.1"
+      //"com.github.japgolly.scalacss" %%% "core" % "0.8.0"
     ),
 
     resolvers += "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots",
     resolvers += "Sonatype OSS Releases" at "https://oss.sonatype.org/content/repositories/releases",
     resolvers += "Typesafe Repository" at "https://repo.typesafe.com/typesafe/releases/",
     resolvers += "Maven Central" at "https://repo1.maven.org/maven2/",
+    resolvers += Resolver.sonatypeRepo("snapshots")
+
 
 
   )
@@ -36,6 +39,8 @@ lazy val client = (project in file("client"))
     // Otras dependencias de Scala.js que puedas necesitar
   )
 
+lazy val root = (project in file(".")).enablePlugins(SbtTwirl)
+
 //repite por si acaso
 enablePlugins(ScalaJSPlugin)
 
@@ -48,4 +53,7 @@ enablePlugins(SbtTwirl)
 enablePlugins(JettyPlugin)
 
 libraryDependencies += "org.scala-js" %%% "scalajs-dom" % "2.4.0"
-//libraryDependencies += "org.scalatra.scalate" %% "scalate-core" % "1.9.5"
+//libraryDependencies += "org.scalatra.scalate" %% "scalate-core" % "1.1.0"
+//libraryDependencies += "com.github.japgolly.scalacss" %%% "core" % "0.8.0-RC1"
+
+

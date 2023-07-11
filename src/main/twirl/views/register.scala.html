@@ -2,51 +2,62 @@
 <html>
 <head>
   <title>Register</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #f2f2f2;
-    }
-    
-    .container {
-      max-width: 300px;
-      margin: 0 auto;
-      padding: 20px;
-      background-color: #fff;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    }
-    
-    .container h2 {
-      text-align: center;
-      margin-bottom: 20px;
-    }
-    
-    .container input[type="text"],
-    .container input[type="password"] {
-      width: 100%;
-      padding: 10px;
-      margin-bottom: 10px;
-      border: 1px solid #ccc;
-      border-radius: 3px;
-    }
-    
-    .container input[type="submit"] {
-      width: 100%;
-      padding: 10px;
-      background-color: #4CAF50;
-      border: none;
-      color: #fff;
-      cursor: pointer;
-      border-radius: 3px;
-    }
-    
-    .container input[type="submit"]:hover {
-      background-color: #45a049;
-    }
-  </style>
 </head>
+<style>
+  body {
+    font-family: Verdana, sans-serif;
+  }
+  .reg_contents {
+            padding: 20px;
+            border-radius: 4px;
+            box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+            background-color: #d1cebd;
+            padding: 50px;
+            justify-content: center;
+        }
+        
+        button, input[type="submit"], .container input[type="submit"] {
+            padding: 10px 20px;
+            background-color: #f57b51;
+            color: white;
+            border: none;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        
+        label,
+        input[type="submit"] {
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        a.button, input[type="submit"] {
+            text-decoration: none;
+            color: white;
+        }
+        
+        .container {
+            max-width: 380px;
+            margin: auto;
+            margin-top: 120px;
+            padding: 20px;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+          }
+  
+          
+          .container input[type="text"],
+          .container input[type="password"] {
+            width: 90%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+          }
+</style>
 <body>
   <div class="container">
     <h2>Register</h2>

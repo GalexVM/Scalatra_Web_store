@@ -1,0 +1,63 @@
+@(productos: Seq[(Int, String,  Double)])
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Productos de carrito</title>
+</head>
+<style>
+    td {
+        display: flex;
+    }
+    form {
+        display: flex;
+        align-items: center;
+        margin-right: 20px; 
+    }
+    .input-table-head {
+        width: 200px;
+        display: inline-block;
+        padding: 4px 8px;
+        border: none;
+        background-color: coral;
+        color: white;
+        font-family: Arial, sans-serif;
+        margin-right: 8px;
+    }
+    .input-table-cell {
+        width: 198px;
+        display: inline-block;
+        padding: 4px 8px;
+        border: none;
+        font-family: Arial, sans-serif;
+        margin-right: 10px;
+    }
+</style>
+<body>
+<h1>Carrito</h1>
+<table>
+    <thead>
+        <tr>
+          <form>
+              <input class="input-table-head" name="id" value="ID" readonly>
+              <input class="input-table-head" name="nombre" value="Nombre" readonly>
+              <input class="input-table-head" name="precio" value="Precio" readonly>
+            </form>
+        </tr>
+      </thead>
+    <tbody>
+    @for((id, nombre, precio) <- productos) {
+        <tr>
+            <td>
+                <form method="POST" action="/del-carrito">
+                  <input class="input-table-cell" name="id" value="@id" readonly>
+                  <input class="input-table-cell" name="nombre" value="@nombre" readonly>
+                  <input class="input-table-cell" name="precio" value="@precio" readonly>
+                  <button type="submit">Quitar del carrito</button>
+                </form>
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>
+</body>
+</html>

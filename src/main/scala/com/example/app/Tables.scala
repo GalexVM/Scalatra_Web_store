@@ -53,12 +53,22 @@ object Tables {
     def * = (id, nombre)
   }
 
+// Definition of the Cart table
+  case class Cart(tag: Tag) extends Table[(Int, String, Double)](tag, "CARTS") {
+    def id: Rep[Int] = column[Int]("ID", O.PrimaryKey, O.AutoInc)
+
+    def nombre: Rep[String] = column[String]("NAME")
+
+    def precio: Rep[Double] = column[Double]("PRICE")
+
+    def * = (id, nombre, precio)
+  }
   val productos = TableQuery[Producto]
   val marcas = TableQuery[Marca]
   val categorías = TableQuery[Categoría]
   val logins = TableQuery[Login]
-
-  val crearTablas = ( marcas.schema ++ categorías.schema ++ productos.schema ++ logins.schema).create
+  val carritos = TableQuery[Cart]
+  val crearTablas = ( marcas.schema ++ categorías.schema ++ productos.schema ++ logins.schema ++ carritos.schema).create
 
   //Valores iniciales de Categoría y Marca
 val insertarValoresInicialesMarcaYCategoria = DBIO.seq(
@@ -82,6 +92,20 @@ val insertarValoresInicialesMarcaYCategoria = DBIO.seq(
     "Lácteos",
     "Snacks",
     "Otros"
+  ),
+  Tables.productos.map(p=>(p.nombre, p.marca, p.categoría, p.precio, p.descripción, p.cantidad_restante)) ++=Seq(
+    ("Sublime", "Ambrosoli", "Snacks",1.0,"Chocolate sublime", 50),
+    ("Leche Gloria","Gloria", "Lácteos", 1.0, "Leche gloria", 50),
+    ("Papas Lay","Frito Lay", "Snacks", 0.5, "Papas clásicas", 20),
+    ("Coca-Cola","Coca-Cola company", "Bebidas", 0.8, "Coca cola original", 10),
+    ("Pollo","Rico Pollo", "Carnes", 0.2, "Pollo entero", 30),
+    ("Queso de mesa","Laive", "Lácteos", 0.9, "Queso para pan", 15),
+    ("Globos azules","Otro", "Otros", 0.3, "Globos medianos", 5),
+    ("Cuates","Ambrosoli", "Snacks", 0.7, "Snack cuates", 25),
+    ("Yogur de fresa","Gloria", "Bebidas", 0.6, "Yogur de fresa", 8),
+    ("Doritos","Frito Lay", "Snacks", 0.4, "Snack doritos", 12),
+    ("Inca kola","Coca-Cola company", "Bebidas", 0.1, "Inka kola original", 18)
+    
   ),
   Tables.logins.map(l=>(l.username,l.password,l.isAdmin))++=Seq(
     ("Carlitos","1234",true),

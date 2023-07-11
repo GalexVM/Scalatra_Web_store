@@ -1,0 +1,94 @@
+
+
+@(productos: Seq[(Int, String, String, String, Double, String, Int)], cats: Seq[String])
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Productos</title>
+</head>
+<style>
+  body {
+    font-family: Verdana, sans-serif;
+  }
+    td {
+        display: flex;
+    }
+    form {
+        display: flex;
+        align-items: center;
+        margin-right: 20px; 
+    }
+    .input-table-head {
+        width: 200px;
+        display: inline-block;
+        padding: 4px 8px;
+        border: none;
+        background-color: coral;
+        color: white;
+        margin-right: 8px;
+    }
+    .input-table-cell {
+        width: 198px;
+        display: inline-block;
+        padding: 4px 8px;
+        border: none;
+        margin-right: 10px;
+    }
+</style>
+<body>
+  <h1>Filtrar</h1>
+  <form method="POST" action="/filtrar">
+    <select id="categoría", name="categoría">
+        @for(cat <- cats){
+            <option value="@cat">@cat</opcion>
+        }
+    </select>
+    <input type="submit" value="Filtrar">
+  </form>
+  <h1>Productos</h1>
+  <table>
+    <thead>
+      <tr>
+        <form>
+            <input class="input-table-head" name="id" value="ID" readonly>
+            <input class="input-table-head" name="nombre" value="Nombre" readonly>
+            <input class="input-table-head" name="marca" value="Marca" readonly>
+            <input class="input-table-head" name="categoría" value="Categoria" readonly>
+            <input class="input-table-head" name="precio" value="Precio" readonly>
+            <input class="input-table-head" name="descripción" value="Descripcion" readonly>
+            <input class="input-table-head" name="cantidad_restante" value="Cantidad_restante" readonly>
+          </form>
+      </tr>
+    </thead>
+    <tbody>
+        @for((id, nombre, marca, categoria, precio, descripcion, cantidad_restante) <- productos) {
+            <tr>
+                <!-- <td>@id</td>
+                <td>@nombre</td>
+                <td>@marca</td>
+                <td>@categoria</td>
+                <td>@precio</td>
+                <td>@descripcion</td>
+                <td>@cantidad_restante</td> -->
+                <td>
+                    <form method="POST" action="/update">
+                      <input class="input-table-cell" name="id" value="@id" readonly>
+                      <input class="input-table-cell" name="nombre" value="@nombre">
+                      <input class="input-table-cell" name="marca" value="@marca">
+                      <input class="input-table-cell" name="categoría" value="@categoria">
+                      <input class="input-table-cell" name="precio" value="@precio">
+                      <input class="input-table-cell" name="descripción" value="@descripcion">
+                      <input class="input-table-cell" name="cantidad_restante" value="@cantidad_restante">
+                      <button type="submit">Update</button>
+                    </form>
+                    <form method="POST" action="/del-cont-form">
+                        <input type="hidden" class="input-table-cell" name="nombre" value="@nombre">
+                        <button type="submit">Delete</button>
+                    </form>
+                </td>
+            </tr>
+          }
+    </tbody>
+  </table>
+</body>
+</html>

@@ -1,27 +1,71 @@
 
 
-@(productos: Seq[(Int, String, String, String, Double, String, Int)])
+@(productos: Seq[(Int, String, String, String, Double, String, Int)], cats:Seq[String])
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Productos del cliente</title>
+  <title>Productos</title>
 </head>
+<style>
+    td {
+        display: flex;
+    }
+    form {
+        display: flex;
+        align-items: center;
+        margin-right: 20px; 
+    }
+    .input-table-head {
+        width: 200px;
+        display: inline-block;
+        padding: 4px 8px;
+        border: none;
+        background-color: coral;
+        color: white;
+        font-family: Arial, sans-serif;
+        margin-right: 8px;
+    }
+    .input-table-cell {
+        width: 198px;
+        display: inline-block;
+        padding: 4px 8px;
+        border: none;
+        font-family: Arial, sans-serif;
+        margin-right: 10px;
+    }
+</style>
 <body>
-  <h1>Productos del cliente</h1>
+  <h1>Filtrar</h1>
+  <form method="POST" action="/filtrar-cliente">
+    <select id="categoría", name="categoría">
+        @for(cat <- cats){
+            <option value="@cat">@cat</opcion>
+        }
+    </select>
+    <input type="submit" value="Filtrar">
+  </form>
+  <h1>Productos</h1>
   <table>
     <thead>
       <tr>
-        <th>ID</th>
-        <th>Nombre</th>
-        <th>Precio</th>
+        <form>
+            <input class="input-table-head" name="id" value="ID" readonly>
+            <input class="input-table-head" name="nombre" value="Nombre" readonly>
+            <input class="input-table-head" name="precio" value="Precio" readonly>
+          </form>
       </tr>
     </thead>
     <tbody>
-        @for((id, nombre, _, _, precio, _, _) <- productos) {
+        @for((id, nombre, _, _, precio, descripcion, cantidad_restante) <- productos) {
             <tr>
-              <td>@id</td>
-              <td>@nombre</td>
-              <td>@precio</td>
+                <td>
+                    <form method="POST" action="/add-carrito">
+                      <input class="input-table-cell" name="id" value="@id" readonly>
+                      <input class="input-table-cell" name="nombre" value="@nombre" readonly>
+                      <input class="input-table-cell" name="precio" value="@precio" readonly>
+                      <button type="submit">Añadir al carrito</button>
+                    </form>
+                </td>
             </tr>
           }
     </tbody>
